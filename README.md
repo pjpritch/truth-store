@@ -196,27 +196,8 @@ POST    /search/v1/:entityId/reindex              Re-index all object of type 'e
 POST    /search/v1/:entityId/:instanceId/reindex  Re-index a single object
 ```
 
-## Internal API (lib/db-client.js)
+## Internal API (lib/db.js)
 
-* getClient()
-```
-const client = getClient();
-```
-* const db = await connect(client, dbName);
+Service API matches underlying Service Impl which has similar named tests.
 
-* const result = await getTenant(client, tenantId);
-* const result = await createTenant(client, tenantId, body);
-* const result = await getEntities(db);
-
-* const result = await getEntity(db, entityId);
-* const result = await createEntity(db, entityId, body);
-
-* const result = await getInstance(db, entityId, instanceId, body);
-* const result = await createInstance(db, entityId, instanceId, body);
-* const result = await updateInstance(db, entityId, instanceId, body);
-* const result = await replaceInstance(db, entityId, instanceId, body);
-* const result = await deleteInstance(db, entityId, instanceId);
-
-* const result = await getPaginatedInstances(db, entityId, options);
-
-* const result = await resolveContext(db, contextId, query);
+ie. Entity API consists of routes/entities => lib/entities.js => test/routes/entities.js
