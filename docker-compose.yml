@@ -1,0 +1,45 @@
+version: "3"
+services:
+  truth:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    user: "node"
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - "./:/usr/src/app"
+    expose:
+      - "8081"
+    command: "npm start"
+    links:
+      - mongo
+  mongo-express:
+    image: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: user
+      ME_CONFIG_BASICAUTH_PASSWORD: user
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
+      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    command: --smallfiles
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: global
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongodb:/data/db"
+
+volumes:
+  mongodb:

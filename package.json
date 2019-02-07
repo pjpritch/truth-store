@@ -1,0 +1,32 @@
+{
+  "name": "truth-store",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "pretest": "node_modules/.bin/eslint --fix .",
+    "test": "TENANT_TOKEN=123 node_modules/.bin/mocha -R spec test test/**/*.js",
+    "coverage": "TENANT_TOKEN=123 node_modules/.bin/nyc --reporter=html --reporter=text node_modules/.bin/mocha -R spec test test/**/*.js"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.0",
+    "hbs": "~4.0.1",
+    "lodash": "^4.17.11",
+    "mongodb": "^3.1.13",
+    "morgan": "~1.9.0",
+    "nano": "^8.0.0",
+    "node-sass-middleware": "0.9.8",
+    "serve-favicon": "~2.4.5",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "supertest": "^3.4.2"
+  }
+}
