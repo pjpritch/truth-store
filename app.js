@@ -6,10 +6,17 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const RedisStore = require('rate-limit-redis');
+const cache = require('./lib/cache');
+
 // const sassMiddleware = require('node-sass-middleware');
 const helpers = require('./lib/handlebars-helpers');
 const { validateAccessToken } = require('./lib/middleware');
 const { NotFoundError } = require('./lib/errors');
+const { API_RATE_LIMIT_MAX, API_RATE_LIMIT_WINDOW_MS } = require('./lib/constants');
 
 const tenants = require('./routes/tenants');
 const entities = require('./routes/entities');
@@ -32,6 +39,18 @@ if (app.get('env') !== 'production') {
   app.set('json spaces', 2);
 }
 
+app.enable('trust proxy');
+
+app.use(helmet());
+
+const apiLimiter = rateLimit({
+  store: new RedisStore({
+    client: cache.getClient(),
+  }),
+  windowMs: API_RATE_LIMIT_WINDOW_MS,
+  max: API_RATE_LIMIT_MAX,
+});
+
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -51,12 +70,12 @@ app.use('/status', (req, res) => {
   res.json({ status: 'up' });
 });
 
-app.use('/tenants/v1', tenants);
+app.use('/tenants/v1', apiLimiter, tenants);
 
-app.use('/entities/v1', validateAccessToken, entities);
-app.use('/templates/v1', validateAccessToken, templates);
-app.use('/contexts/v1', validateAccessToken, contexts);
-app.use('/objects/v1', validateAccessToken, instances);
+app.use('/entities/v1', apiLimiter, validateAccessToken, entities);
+app.use('/templates/v1', apiLimiter, validateAccessToken, templates);
+app.use('/contexts/v1', apiLimiter, validateAccessToken, contexts);
+app.use('/objects/v1', apiLimiter, validateAccessToken, instances);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
