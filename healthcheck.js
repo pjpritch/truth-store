@@ -8,6 +8,7 @@ const options = {
 };
 
 const request = http.request(options, (res) => {
+  // eslint-disable-next-line no-console
   console.log(`STATUS: ${res.statusCode}`);
   if (res.statusCode === 200) {
     process.exit(0);
@@ -17,7 +18,8 @@ const request = http.request(options, (res) => {
 });
 
 request.on('error', (err) => {
-  console.log('ERROR');
+  // eslint-disable-next-line no-console
+  console.log(`ERROR: ${err.message}\n${err.stack}`);
   process.exit(1);
 });
 
