@@ -31,3 +31,4 @@ npm-debug.log
 
 .vscode
 .nyc_output
+.DS_Store

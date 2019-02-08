@@ -1,5 +1,15 @@
 version: "3"
 services:
+  lb:
+    image: dockercloud/haproxy
+    links:
+      - truth
+    environment:
+      - BALANCE=leastconn
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3333:80"
   truth:
     build:
       context: .
@@ -9,10 +19,14 @@ services:
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017/test
+      - ES_URL=es:9200
+      - REDIS_URL=redis://redis:6379/1
+      - TENANT_TOKEN=123
     volumes:
       - "./:/usr/src/app"
     expose:
-      - "8081"
+      - "3000"
     command: "npm start"
     links:
       - mongo
@@ -26,11 +40,9 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: user
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'false'
-      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
     ports:
-      - "8081:8081"
-    depends_on:
+      - "3334:8081"
+    links:
       - mongo
   mongo:
     image: mongo
@@ -38,8 +50,8 @@ services:
     restart: always
     environment:
       MONGO_INITDB_DATABASE: global
-    ports:
-      - "27017:27017"
+    expose:
+      - 27017
     volumes:
       - "mongodb:/data/db"
   es:

@@ -2,6 +2,16 @@
 
 This project was started on Feb 1, 2019, after coming up with a rough outline the day before (see _Planned_).
 
+## tl;dr
+`docker-compose up -d` will bring up:
+* MongoDB
+* Redis
+* Elastic Search
+* Truth Service - run as many instances as needed (`docker-compose up -d --scale truth=2`)
+* HAProxy - reachable at `localhost:3333` -or- `${tenantId}.domain.local:3333`
+* Mongo Express - reachable at `localhost:3334`
+
+
 ## Planned:
 
 This repo implements a multi-tenant capable object store for any SaaS platform.

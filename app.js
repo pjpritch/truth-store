@@ -6,7 +6,7 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const sassMiddleware = require('node-sass-middleware');
+// const sassMiddleware = require('node-sass-middleware');
 const helpers = require('./lib/handlebars-helpers');
 const { validateAccessToken } = require('./lib/middleware');
 const { NotFoundError } = require('./lib/errors');
@@ -38,13 +38,18 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(sassMiddleware({
-  src: path.join(__dirname, 'public'),
-  dest: path.join(__dirname, 'public'),
-  indentedSyntax: true, // true = .sass and false = .scss
-  sourceMap: true
-}));
+// app.use(sassMiddleware({
+//   src: path.join(__dirname, 'public'),
+//   dest: path.join(__dirname, 'public'),
+//   indentedSyntax: true, // true = .sass and false = .scss
+//   sourceMap: true
+// }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/status', (req, res) => {
+  // Add logic here
+  res.json({ status: 'up' });
+});
 
 app.use('/tenants/v1', tenants);
 
