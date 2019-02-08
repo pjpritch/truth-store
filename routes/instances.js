@@ -19,7 +19,7 @@ router.param('entityId', async (req, res, next) => {
 
 // list all instances, paginated and basic query capabilities
 router.get('/:entityId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { entityId } = req.params;
   const { start, count } = req.query;
 
@@ -29,14 +29,12 @@ router.get('/:entityId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 
 // get an existing instance
 router.get('/:entityId/:instanceId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { instanceId, entityId } = req.params;
 
   try {
@@ -46,14 +44,12 @@ router.get('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 
 // create a new instance
 router.post('/:entityId/:instanceId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { instanceId, entityId } = req.params;
 
   try {
@@ -62,14 +58,12 @@ router.post('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result, 201);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 
 // replace an existing instance
 router.put('/:entityId/:instanceId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { instanceId, entityId } = req.params;
 
   try {
@@ -78,14 +72,12 @@ router.put('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 
 // update an existing instance
 router.patch('/:entityId/:instanceId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { instanceId, entityId } = req.params;
 
   try {
@@ -94,14 +86,12 @@ router.patch('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 
 // delete an existing instance
 router.delete('/:entityId/:instanceId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { instanceId, entityId } = req.params;
 
   try {
@@ -111,8 +101,6 @@ router.delete('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
-  } finally {
-    client.close();
   }
 });
 

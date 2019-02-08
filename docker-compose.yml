@@ -16,6 +16,8 @@ services:
     command: "npm start"
     links:
       - mongo
+      - es
+      - redis
   mongo-express:
     image: mongo-express
     restart: always
@@ -40,6 +42,18 @@ services:
       - "27017:27017"
     volumes:
       - "mongodb:/data/db"
-
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.0
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
 volumes:
   mongodb:
+    driver: local
+  esdata1:
+    driver: local

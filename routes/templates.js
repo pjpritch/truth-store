@@ -8,7 +8,7 @@ const router = express.Router();
 
 // list all templates, paginated and basic query capabilities
 router.get('/', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { start, count } = req.query;
 
   try {
@@ -21,15 +21,13 @@ router.get('/', async (req, res) => {
     });
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // render an existing instance of context with a template
 router.get('/:templateId/render/:entityId/:instanceId', async (req, res) => {
   const { templateId, entityId, instanceId } = req.params;
-  const { query, db, client } = req;
+  const { query, db } = req;
 
   try {
     const template = await Template.findOne(db, templateId);
@@ -47,14 +45,12 @@ router.get('/:templateId/render/:entityId/:instanceId', async (req, res) => {
     res.send(rendering);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // get an existing template
 router.get('/:templateId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { templateId } = req.params;
 
   try {
@@ -64,14 +60,12 @@ router.get('/:templateId', async (req, res) => {
     Template.handleAPIResponse(res, result);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // create a new template
 router.post('/:templateId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { templateId } = req.params;
 
   try {
@@ -80,14 +74,12 @@ router.post('/:templateId', async (req, res) => {
     Template.handleAPIResponse(res, result, 201);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // replace an existing template
 router.put('/:templateId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { templateId } = req.params;
 
   try {
@@ -96,14 +88,12 @@ router.put('/:templateId', async (req, res) => {
     Template.handleAPIResponse(res, result);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // update an existing template
 router.patch('/:templateId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { templateId } = req.params;
 
   try {
@@ -113,14 +103,12 @@ router.patch('/:templateId', async (req, res) => {
     Template.handleAPIResponse(res, result);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // delete an existing template
 router.delete('/:templateId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { templateId } = req.params;
 
   try {
@@ -130,8 +118,6 @@ router.delete('/:templateId', async (req, res) => {
     Template.handleAPIResponse(res, result);
   } catch (e) {
     Template.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 

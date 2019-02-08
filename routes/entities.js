@@ -8,7 +8,7 @@ const router = express.Router();
 
 // list all entities
 router.get('/', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
 
   try {
     const result = await Entity.find(db, {});
@@ -16,14 +16,12 @@ router.get('/', async (req, res) => {
     Entity.handleAPIResponse(res, result);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // get an existing entity
 router.get('/:entityId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { entityId } = req.params;
 
   try {
@@ -33,14 +31,12 @@ router.get('/:entityId', async (req, res) => {
     Entity.handleAPIResponse(res, entity);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // create new entity
 router.post('/:entityId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { entityId } = req.params;
 
   try {
@@ -49,14 +45,12 @@ router.post('/:entityId', async (req, res) => {
     Entity.handleAPIResponse(res, result, 201);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // replace an existing entity
 router.put('/:entityId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { entityId } = req.params;
 
   try {
@@ -65,14 +59,12 @@ router.put('/:entityId', async (req, res) => {
     Entity.handleAPIResponse(res, result);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // update an existing entity
 router.patch('/:entityId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { entityId } = req.params;
 
   try {
@@ -82,14 +74,12 @@ router.patch('/:entityId', async (req, res) => {
     Entity.handleAPIResponse(res, result);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // delete an existing entity
 router.delete('/:entityId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { entityId } = req.params;
 
   try {
@@ -99,8 +89,6 @@ router.delete('/:entityId', async (req, res) => {
     Entity.handleAPIResponse(res, result);
   } catch (e) {
     Entity.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 

@@ -8,7 +8,7 @@ const router = express.Router();
 
 // list all contexts, paginated and basic query capabilities
 router.get('/', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { start, count } = req.query;
 
   try {
@@ -21,14 +21,12 @@ router.get('/', async (req, res) => {
     });
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // get an existing context
 router.get('/:contextId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { contextId } = req.params;
 
   try {
@@ -38,14 +36,12 @@ router.get('/:contextId', async (req, res) => {
     Context.handleAPIResponse(res, result);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // render an existing instance
 router.get('/:contextId/render', async (req, res) => {
-  const { client, db, query } = req;
+  const { db, query } = req;
   const { contextId } = req.params;
 
   try {
@@ -57,14 +53,12 @@ router.get('/:contextId/render', async (req, res) => {
     Context.handleAPIResponse(res, instance);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // create a new context
 router.post('/:contextId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { contextId } = req.params;
 
   try {
@@ -73,14 +67,12 @@ router.post('/:contextId', async (req, res) => {
     Context.handleAPIResponse(res, result, 201);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // replace an existing context
 router.put('/:contextId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { contextId } = req.params;
 
   try {
@@ -89,14 +81,12 @@ router.put('/:contextId', async (req, res) => {
     Context.handleAPIResponse(res, result);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // update an existing context
 router.patch('/:contextId', async (req, res) => {
-  const { client, db, body } = req;
+  const { db, body } = req;
   const { contextId } = req.params;
 
   try {
@@ -106,14 +96,12 @@ router.patch('/:contextId', async (req, res) => {
     Context.handleAPIResponse(res, result);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // delete an existing context
 router.delete('/:contextId', async (req, res) => {
-  const { client, db } = req;
+  const { db } = req;
   const { contextId } = req.params;
 
   try {
@@ -123,8 +111,6 @@ router.delete('/:contextId', async (req, res) => {
     Context.handleAPIResponse(res, result);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 

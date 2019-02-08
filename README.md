@@ -18,8 +18,8 @@ Using DNS subdomains, http://_subdomain_._domain_, this service provides a REST 
 
 * ~~Templates API - render API instances/contexts into HTML, JSON, XML, etc.  Render returns custom Content-Type.  CRUD/PATCH + render implemented.~~
 
-* Optimize for READs: Caching service w/ Memcached or Redis
-* Optimize for SEARCH: Search service w/ Elastic Search
+* ~~Optimize for READs: Caching service w/ Redis~~
+* ~~Optimize for SEARCH: Search service w/ Elastic Search~~
 * Optimize for scale: MQ support for object mutations and workers
 
 * Transform API - render API instances/contexts into other schemas, using DB-defined mapping models (key path and inline functions).

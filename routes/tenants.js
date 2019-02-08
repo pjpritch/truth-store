@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const { getClient, globalDB, Tenant } = require('../lib/db');
+const { globalDB, Tenant } = require('../lib/db');
 const { validateTenantToken } = require('../lib/middleware');
 const { NotFoundError } = require('../lib/errors');
 
@@ -13,11 +13,8 @@ router.all('*', validateTenantToken);
 
 /* GET all tenants */
 router.get('/', async (req, res) => {
-  const client = getClient();
-
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const result = await Tenant.find(db, {});
     const ids = result.data.map(col => col.id);
@@ -28,19 +25,15 @@ router.get('/', async (req, res) => {
     });
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 /* GET an existing tenant */
 router.get('/:tenantId', async (req, res) => {
   const { tenantId } = req.params;
-  const client = getClient();
 
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const result = await Tenant.findOne(db, tenantId);
     if (!result) throw new NotFoundError();
@@ -48,8 +41,6 @@ router.get('/:tenantId', async (req, res) => {
     Tenant.handleAPIResponse(res, result);
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
@@ -57,19 +48,15 @@ router.get('/:tenantId', async (req, res) => {
 router.post('/:tenantId', async (req, res) => {
   const { tenantId } = req.params;
   const { body } = req;
-  const client = getClient();
 
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const tenant = await Tenant.create(db, tenantId, body);
 
     Tenant.handleAPIResponse(res, tenant, 201);
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
@@ -77,11 +64,9 @@ router.post('/:tenantId', async (req, res) => {
 router.patch('/:tenantId', async (req, res) => {
   const { tenantId } = req.params;
   const { body } = req;
-  const client = getClient();
 
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const result = await Tenant.update(db, tenantId, body);
     if (!result) throw new NotFoundError();
@@ -89,8 +74,6 @@ router.patch('/:tenantId', async (req, res) => {
     Tenant.handleAPIResponse(res, result);
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
@@ -98,30 +81,24 @@ router.patch('/:tenantId', async (req, res) => {
 router.put('/:tenantId', async (req, res) => {
   const { tenantId } = req.params;
   const { body } = req;
-  const client = getClient();
 
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const result = await Tenant.replace(db, tenantId, body);
 
     Tenant.handleAPIResponse(res, result);
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 
 // DELETE tenant
 router.delete('/:tenantId', async (req, res) => {
   const { tenantId } = req.params;
-  const client = getClient();
 
   try {
-    await client.connect();
-    const db = globalDB(client);
+    const db = globalDB();
 
     const result = await Tenant.delete(db, tenantId);
     if (!result) throw new NotFoundError();
@@ -129,8 +106,6 @@ router.delete('/:tenantId', async (req, res) => {
     Tenant.handleAPIResponse(res, result);
   } catch (e) {
     Tenant.handleAPIErrorResponse(res, e);
-  } finally {
-    client.close();
   }
 });
 

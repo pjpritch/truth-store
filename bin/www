@@ -5,6 +5,8 @@
  * Module dependencies.
  */
 
+global.Promise = require('bluebird');
+
 const app = require('../app');
 const debug = require('debug')('truth-store:server');
 const http = require('http');

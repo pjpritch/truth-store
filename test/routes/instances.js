@@ -4,7 +4,6 @@
 const assert = require('assert');
 const app = require('../../app');
 const {
-  getClient,
   globalDB,
   tenantDB,
   Entity,
@@ -25,15 +24,13 @@ const request = require('supertest').agent(baseUrl);
 describe('/objects/v1 API', function test() {
   this.timeout(10000);
 
-  const client = getClient();
   let server;
   let token;
   let db;
   before(async () => {
-    await client.connect();
-    db = globalDB(client);
+    db = globalDB();
     const tenant = await Tenant.create(db, TENANT_ID, {});
-    db = tenantDB(client, TENANT_ID);
+    db = tenantDB(TENANT_ID);
     await Entity.create(db, 'products', {});
     token = tenant.accessToken;
     server = await app.listen(PORT);
@@ -41,9 +38,8 @@ describe('/objects/v1 API', function test() {
   after(async () => {
     server.close();
     await Entity.delete(db, 'products');
-    db = globalDB(client);
+    db = globalDB();
     await Tenant.delete(db, TENANT_ID);
-    client.close();
   });
 
   context('GET /objects/v1/products', () => {
