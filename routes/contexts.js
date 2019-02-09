@@ -50,6 +50,7 @@ router.get('/:contextId/render', async (req, res) => {
 
     const instance = await Context.resolveContext(db, result, query);
     if (!instance) throw new BadRequestError();
+
     Context.handleAPIResponse(res, instance);
   } catch (e) {
     Context.handleAPIErrorResponse(res, e);

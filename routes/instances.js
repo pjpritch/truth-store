@@ -3,6 +3,7 @@
 const express = require('express');
 const { Instance, Entity } = require('../lib/db');
 const { NotFoundError } = require('../lib/errors');
+const search = require('../lib/search');
 
 const router = express.Router();
 
@@ -18,6 +19,25 @@ router.param('entityId', async (req, res, next) => {
 });
 
 // list all instances, paginated and basic query capabilities
+router.get('/search', async (req, res) => {
+  const { db } = req;
+  const { databaseName } = db;
+  const { q } = req.query;
+
+  try {
+    const result = await search.searchAll(databaseName, q);
+    const { hits, total } = result.hits;
+
+    // eslint-disable-next-line
+    const data = hits.map(hit => ({ _entity:hit._type, ...hit._source }));
+
+    Instance.handleAPIResponse(res, 'search', { _query: q, data, total });
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, 'search', e);
+  }
+});
+
+// list all instances, paginated and basic query capabilities
 router.get('/:entityId', async (req, res) => {
   const { db } = req;
   const { entityId } = req.params;
@@ -27,6 +47,26 @@ router.get('/:entityId', async (req, res) => {
     const result = await Instance.find(db, entityId, { start, count });
 
     Instance.handleAPIResponse(res, entityId, result);
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, entityId, e);
+  }
+});
+
+// list all instances, paginated and basic query capabilities
+router.get('/:entityId/search', async (req, res) => {
+  const { db } = req;
+  const { databaseName } = db;
+  const { entityId } = req.params;
+  const { q } = req.query;
+
+  try {
+    const result = await search.search(databaseName, entityId, q);
+    const { hits, total } = result.hits;
+
+    // eslint-disable-next-line no-underscore-dangle
+    const data = hits.map(hit => hit._source);
+
+    Instance.handleAPIResponse(res, entityId, { _query: q, data, total });
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
   }
