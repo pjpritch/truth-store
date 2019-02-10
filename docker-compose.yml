@@ -11,6 +11,7 @@ services:
     ports:
       - "3333:80"
   truth:
+    image: pjpritch/truth-service
     build:
       context: .
       args:
@@ -34,6 +35,29 @@ services:
       - es
       - redis
       - rabbitmq
+  truth-worker:
+    image: pjpritch/truth-service
+    user: "node"
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017/test
+      - AMQP_URL=amqp://user:user@rabbitmq
+      - ES_URL=es:9200
+      - REDIS_URL=redis://redis:6379/1
+      - TENANT_TOKEN=123
+    volumes:
+      - "./:/usr/src/app"
+    healthcheck:
+      disable: true
+    command: "node queue-worker.js"
+    links:
+      - mongo
+      - es
+      - redis
+      - rabbitmq
+    depends_on:
+      - truth
   mongo-express:
     image: mongo-express
     restart: always
