@@ -4,6 +4,8 @@
 const assert = require('assert');
 const app = require('../../app');
 
+const { TENANT_COLLECTION_NAME, TENANT_API_VERSION } = require('../../lib/constants');
+
 const PORT = 3000;
 const baseUrl = `http://localhost:${PORT}`;
 const request = require('supertest').agent(baseUrl);
@@ -43,9 +45,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.ok(body.data);
     });
 
@@ -56,9 +58,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.ok(body.data);
     });
   });
@@ -83,9 +85,9 @@ describe('/tenants/v1 API', () => {
         .expect(201);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.equal(body.id, 'joe');
       assert.ok(body.accessToken);
       assert.equal(body.other, 'stuff');
@@ -101,9 +103,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.equal(body.id, 'joe');
     });
 
@@ -128,9 +130,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.equal(body.id, 'joe');
       assert.ok(body.accessToken);
       assert.equal(body.other, 'stuff');
@@ -159,9 +161,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.equal(body.id, 'joe');
       assert.equal(body.accessToken, 'freddy');
       assert.equal(body.other, 'stuff');
@@ -177,9 +179,9 @@ describe('/tenants/v1 API', () => {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, 1);
+      assert.equal(body._v, TENANT_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, 'tenants');
+      assert.equal(body._entity, TENANT_COLLECTION_NAME);
       assert.equal(body.id, 'joe');
     });
 

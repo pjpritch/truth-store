@@ -1,7 +1,14 @@
+// Copyright 2019 Peter Pritchard.  All rights reserved.
+
 const queue = require('./lib/queue');
-const cache = require('./lib/cache');
-const search = require('./lib/search');
-const { GLOBAL_NAMESPACE } = require('./lib/constants');
+
+const {
+  CHANGE_EVENT_TYPE,
+  DELETE_EVENT_TYPE,
+  GET_EVENT_TYPE,
+} = require('./lib/constants');
+
+const { Instance } = require('./lib/db');
 
 async function handleChangeEvent(msg) {
   const {
@@ -11,28 +18,24 @@ async function handleChangeEvent(msg) {
     info,
   } = msg;
 
-  const isCustomObject = (_tenantId !== GLOBAL_NAMESPACE && _entityId[0] !== '_');
   // eslint-disable-next-line no-console,object-curly-newline
   console.log(`Handling Change Event: ${{ _tenantId, _entityId, type, info }}`);
-  if (type === 'change') {
-    await cache.invalidateInstance(_tenantId, _entityId, info.instanceId);
 
-    if (isCustomObject) {
-      await search.indexInstance(_tenantId, _entityId, info.instance);
-    }
-  } else if (type === 'delete') {
-    await cache.invalidateInstance(_tenantId, _entityId, info.id);
-
-    if (isCustomObject) {
-      await search.unindexInstance(_tenantId, _entityId, info.instanceId);
-    }
-  } else if (type === 'get') {
-    await cache.cacheInstance(_tenantId, _entityId, info.instance);
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(`Unknown Event Type: '${type}'`);
-    // eslint-disable-next-line no-console
-    console.log(msg);
+  switch (type) {
+    case CHANGE_EVENT_TYPE:
+      await Instance.doAfterChange(_tenantId, _entityId, info.instance);
+      break;
+    case DELETE_EVENT_TYPE:
+      await Instance.doAfterDelete(_tenantId, _entityId, info.instanceId);
+      break;
+    case GET_EVENT_TYPE:
+      await Instance.doAfterGet(_tenantId, _entityId, info.instance);
+      break;
+    default:
+      // eslint-disable-next-line no-console
+      console.log(`Unknown Event Type: '${type}'`);
+      // eslint-disable-next-line no-console
+      console.log(msg);
   }
 }
 

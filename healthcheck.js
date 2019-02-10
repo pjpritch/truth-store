@@ -1,3 +1,5 @@
+// Copyright 2019 Peter Pritchard.  All rights reserved.
+
 const http = require('http');
 
 const options = {

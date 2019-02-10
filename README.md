@@ -10,7 +10,7 @@ This project was started on Feb 1, 2019, after coming up with a rough outline th
 * Rabbit MQ
 * Truth Service - run as many instances as needed (`docker-compose up -d --scale truth=2`)
 * Truth Worker - run as many instances as needed (`docker-compose up -d --scale truth-worker=2`)
-* HAProxy - reachable at `localhost:3333` -or- `${tenantId}.127.0.0.1.xip.io:3333`
+* HAProxy - reachable at `localhost:3333` -or- `${tenantId}.127.0.0.1.nip.io:3333`
 * Mongo Express - reachable at `localhost:3334`
 * RabbitMQ Management - reachable at `localhost:15672`
 
@@ -61,16 +61,16 @@ bring up mongoDB, redis, elastic search, rabbit mq, ha proxy, the truth api serv
 
 ### What you get
 
-then you can reach the following endpoints (using xip.io):
+then you can reach the following endpoints (using nip.io):
 
-* http://127.0.0.1.xip.io:3333/tenants/v1(/:tenantId) - CRUD operations - Provision and de-provision tenants
-* http://${tenantId}.127.0.0.1.xip.io:3333/entities/v1(/:entityId) - CRUD operations on Custom Object Types (class-level singleton, schemas, ...)
-* http://${tenantId}.127.0.0.1.xip.io:3333/objects/v1(/:entityId(/:instanceId)) - CRUD Manage Custom Objects 
-* http://${tenantId}.127.0.0.1.xip.io:3333/contexts/v1(/:contextId(/render)) - CRUD Manage & Render Contexts Graphs
-* http://${tenantId}.127.0.0.1.xip.io:3333/templates/v1(/:templateId(/render/:entityId/:instanceId)) - CRUD Manage Dynamic Templates
+* http://127.0.0.1.nip.io:3333/tenants/v1(/:tenantId) - CRUD operations - Provision and de-provision tenants
+* http://${tenantId}.127.0.0.1.nip.io:3333/entities/v1(/:entityId) - CRUD operations on Custom Object Types (class-level singleton, schemas, ...)
+* http://${tenantId}.127.0.0.1.nip.io:3333/objects/v1(/:entityId(/:instanceId)) - CRUD Manage Custom Objects 
+* http://${tenantId}.127.0.0.1.nip.io:3333/contexts/v1(/:contextId(/render)) - CRUD Manage & Render Contexts Graphs
+* http://${tenantId}.127.0.0.1.nip.io:3333/templates/v1(/:templateId(/render/:entityId/:instanceId)) - CRUD Manage Dynamic Templates
 
-* http://127.0.0.1.xip.io:3334 - Mongo Express - MongoDB Admin app
-* http://127.0.0.1.xip.io:15672 - Rabbit MQ Management - Rabbit MQ Admin app
+* http://127.0.0.1.nip.io:3334 - Mongo Express - MongoDB Admin app
+* http://127.0.0.1.nip.io:15672 - Rabbit MQ Management - Rabbit MQ Admin app
 
 Additionally, 5 additional services are started:
 
@@ -120,7 +120,7 @@ run `npm install` to load local dependencies
 make sure to add the following line to your local `/etc/hosts` file:
 `127.0.0.1       non-existent-tenant.domain.local joe.domain.local fred.domain.local test-tenant.domain.local barney.domain.local` for tests to pass
 
-I will update the tests to use xip.io in the future perhaps ...
+I will update the tests to use nip.io in the future perhaps ...
 
 See `sample.env` for available ENV overrides.
 

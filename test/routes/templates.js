@@ -21,7 +21,7 @@ const {
 
 const PORT = 3000;
 const TENANT_ID = 'test-tenant';
-const TEST_DOMAIN = '.domain.local';
+const TEST_DOMAIN = '.127.0.0.1.nip.io';
 const baseUrl = `http://${TENANT_ID}${TEST_DOMAIN}:${PORT}`;
 const request = require('supertest').agent(baseUrl);
 
