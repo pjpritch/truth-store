@@ -30,14 +30,19 @@ Using DNS subdomains, http://_subdomain_._domain_, this service provides a REST 
 
 * ~~Optimize for READs: Caching service w/ Redis~~
 * ~~Optimize for SEARCH: Search service w/ Elastic Search~~
-* Optimize for scale: MQ support for object mutations and workers
+* ~~Optimize for scale: MQ support for object mutations and workers~~
 
 * Transform API - render API instances/contexts into other schemas, using DB-defined mapping models (key path and inline functions).
 
-* Frontend dashboard for APIs
+* Frontend dashboard for APIs:
+- Contexts
+- Entities
+- Templates
 
 * Dynamic Applications
+- Middleware and SDK for ExpressJS app running on same cluster (using k8s internal load balancer and private HTTP header for tenant)
 
+- Mapping routes to context + templates
 - "path w/ params and query": {
   layout: 'contains page structure',
   template: 'page detail',
@@ -50,11 +55,52 @@ Using DNS subdomains, http://_subdomain_._domain_, this service provides a REST 
 
 ### Dependencies
 
-bring up mongoDB with `docker-compose up -d mongo`.  this will give you a MongoDB instance running on port 27017, with local host disk persistence.
+bring up mongoDB, redis, elastic search, rabbit mq, ha proxy, the truth api server and the truth work with `docker-compose up -d`.
 
-when the feature is added, you will do the same for Elastic Search and Redis/Memcached, eg. `docker-compose up -d mongo es memcached`.
+### What you get
 
-### Installation
+then you can reach the following endpoints (using xip.io):
+
+* http://127.0.0.1.xip.io:3333/tenants/v1(/:tenantId) - CRUD operations - Provision and de-provision tenants
+* http://${tenantId}.127.0.0.1.xip.io:3333/entities/v1(/:entityId) - CRUD operations on Custom Object Types (class-level singleton, schemas, ...)
+* http://${tenantId}.127.0.0.1.xip.io:3333/objects/v1(/:entityId(/:instanceId)) - CRUD Manage Custom Objects 
+* http://${tenantId}.127.0.0.1.xip.io:3333/contexts/v1(/:contextId(/render)) - CRUD Manage & Render Contexts Graphs
+* http://${tenantId}.127.0.0.1.xip.io:3333/templates/v1(/:templateId(/render/:entityId/:instanceId)) - CRUD Manage Dynamic Templates
+
+* http://127.0.0.1.xip.io:3334 - Mongo Express - MongoDB Admin app
+* http://127.0.0.1.xip.io:15672 - Rabbit MQ Management - Rabbit MQ Admin app
+
+Additionally, 5 additional services are started:
+
+- __MongoDB__ - port 27017 - stores all platform data, with each tenant's information in a single MongoDB namespace - persistent volume attached
+- __Redis__ - port 6379 - acts as a cache for the API server and for API limiting middleware (optimize for READ)
+- __Elastic Search__ - port 9200 - acts as a search index, one index per tenant/object type (optimize for SEARCH) - persistent volume attached
+- __Rabbit MQ__ - port 5672 - acts as a message broker for message queues - persistent volume attached
+- __HA Proxy__ - port 3333 - allows for scaling underlying tenant API services, without port conflicts
+
+The Tenant API uses an environment variable: `TENANT_TOKEN` that must be included with all Tenant API calls (either in the `token` query string param or sent as a HTTP header `x-tenant-token`).
+
+Each Tenant object is assigned an `accessToken` property, which must be included with all other API calls (either in the `token` query string param or sent as a HTTP header `x-store-token`).
+
+### Using Docker-based backing services for local development
+
+You can also run and develop the truth-store nodeJS services (server and worker) locally, by default from port 3000.  You can use the same backing stores from within `docker-compose.yml` (Mongo, Redis, Elastic Search and Rabbit MQ).
+
+When running in "isolated mode", each service include a `expose:` directive, eg:
+
+```
+  expose:
+  - "27017"
+```
+
+when exposing the same port to the localhost, use `ports` instead:
+
+```
+  ports:
+  - "27017:27017"
+```
+
+### Local Installation
 
 clone this repo
 
@@ -67,15 +113,20 @@ clone this repo
 run `npm install` to load local dependencies
 
 `npm test` to run Mocha/Supertest API tests
-`npm run start` to run locally
+`npm start` or `./bin/www` to run server API locally
 
 make sure to add the following line to your local `/etc/hosts` file:
 `127.0.0.1       non-existent-tenant.domain.local joe.domain.local fred.domain.local test-tenant.domain.local barney.domain.local` for tests to pass
 
-`docker build -t <user>/<image>:<tag> .` to build a Docker image
-`docker push <user>/<image>:<tag>` to push to your docker repo
+I will update the tests to use xip.io in the future perhaps ...
 
 See `sample.env` for available ENV overrides.
+
+Running `docker-compose build truth` will build a local Docker-image.
+
+Running `npm run worker` or `node queue-worker.js` will start the Rabbit MQ consumer worker, which handles object mutation notifications.
+
+Try to keep in mind that if you have the `truth-worker` running in Docker AND running it locally, you may or may not be debugging the same consumer that receives all messages ...
 
 ## Theory of Operation
 
@@ -83,11 +134,11 @@ This purpose of this platform is to serve as a "reactive truth database".  With 
 
 I also added in the idea of "Contexts", which aggregates graphs of related instances into a single response, and "Templates", which enable rendering arbitrary content-types, using Handlebars and any "Instance" or "Context" as the rendering context.  This allows for generation of any Content-Type, eg. XML, HTML, JSON (schema changes), JSX, ...
 
-This platform uses MongoDB for it's underlying data store, but the implementation details are hidden in `lib/db-client.js`.  This means that, should we decide in the fute, to replace MongoDB with something else, we can.
+This platform uses MongoDB for it's underlying data store, but the implementation details are hidden in `lib/db.js`.  This means that, should we decide in the fute, to replace MongoDB with something else, we can.
 
 Because all DB interations are in a single file, it also makes it easy to make future changes (like posting every object mutation as an event to a MQ or later conversion to _eventually consistent_ mode).
 
-Express middleware handles basic token auth routines, as well as placing `client` and `db` properties on the `req` object, for everything in `routes/[entities|instances|contexts|templates].js`.  `routes/index.js` is a special case that deals directly with the administration of the platform, so it uses it's own Express middleware for auth and db access.
+Express middleware handles basic token auth routines, as well as placing `client` and `db` properties on the `req` object, for everything in `routes/[entities|instances|contexts|templates].js`.  `routes/tenants.js` is a special case that deals directly with the administration of the platform, so it uses it's own Express middleware for auth and db access.
 
 By the time the middleware is completed, the Tenant scope is defined (isolation + auth) and entity is loaded (schema + metadata) and the instance itself, of whatever type.  (Tenant, Entity, Instance, Template, Context, etc are all really just "Tenant-specific Entity Instances").
 
@@ -109,7 +160,7 @@ By the time the middleware is completed, the Tenant scope is defined (isolation 
 
 `http://joe.domain.local/contexts/v1/product-details` === defines dynamic bindings for "product-details" context from "joe" namespace
 
-`http://joe.domain.local/context/product-details/render?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === one dynamic object graph (mixed entities) of all information needed to render "product-details" context from "joe" namespace
+`http://joe.domain.local/contexts/product-details/render?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === one dynamic object graph (mixed entities) of all information needed to render "product-details" context from "joe" namespace
 
 #### Templates API
 `http://joe.domain.local/templates/v1` === all templates from "joe" namespace
@@ -127,7 +178,6 @@ API responses and API error responses all include the same style metadata, to ma
 All API endpoints are fully asynchronous in nature and use ES6 async/await and try/catch/finally constructs.
 
 Decent test coverage for API endpoints is provided, using Mocha and Supertest.
-
 
 ## REST APIs
 
