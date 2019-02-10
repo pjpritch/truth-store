@@ -26,11 +26,13 @@ services:
       - REDIS_URL=redis://redis:6379/1
       - TENANT_TOKEN=123
       - USE_MQ=true
+      - EXCLUDE_PORTS=9229
     volumes:
       - "./:/usr/src/app"
-    expose:
+    ports:
       - "3000"
-    command: "npm start"
+      - "9229:9229"
+    command: "./node_modules/.bin/nodemon --nolazy --inspect=0.0.0.0:9229 ./bin/www"
     links:
       - mongo
       - es
@@ -77,8 +79,8 @@ services:
     restart: always
     environment:
       MONGO_INITDB_DATABASE: global
-    expose:
-      - 27017
+    ports:
+      - "27017:27017"
     volumes:
       - "mongodb:/data/db"
   es:
