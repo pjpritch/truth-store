@@ -29,7 +29,9 @@ async function handleChangeEvent(msg) {
   } else if (type === 'get') {
     await cache.cacheInstance(_tenantId, _entityId, info.instance);
   } else {
+    // eslint-disable-next-line no-console
     console.log(`Unknown Event Type: '${type}'`);
+    // eslint-disable-next-line no-console
     console.log(msg);
   }
 }
@@ -44,6 +46,7 @@ async function handleChangeEvent(msg) {
       const event = JSON.parse(content);
 
       await handleChangeEvent(event);
+      // eslint-disable-next-line no-console
       console.log(event);
       queue.ack(msg);
     } catch (e) {
@@ -51,5 +54,6 @@ async function handleChangeEvent(msg) {
     }
   });
 
+  // eslint-disable-next-line no-console
   console.log('Listening for mutation events.');
 })();

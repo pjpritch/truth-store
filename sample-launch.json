@@ -14,10 +14,22 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Launch Worker",
+      "program": "${workspaceFolder}/queue-worker.js",
+      "env": {
+        "NODE_ENV": "development",
+        "TENANT_TOKEN": "123"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Test",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/mocha",
-      "args": ["-R", "spec", "${workspaceFolder}/test", "${workspaceFolder}/test/**/*.js"],
+      "args": ["-R", "spec", "${workspaceFolder}/test/*.js", "${workspaceFolder}/test/**/*.js"],
       "env":{
+        "PORT": "3000",
+        "DEBUG": "*",
         "NODE_ENV": "test",
         "TENANT_TOKEN": "123"
       }
