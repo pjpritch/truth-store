@@ -7,10 +7,12 @@ This project was started on Feb 1, 2019, after coming up with a rough outline th
 * MongoDB
 * Redis
 * Elastic Search
+* Rabbit MQ
 * Truth Service - run as many instances as needed (`docker-compose up -d --scale truth=2`)
-* HAProxy - reachable at `localhost:3333` -or- `${tenantId}.domain.local:3333`
+* Truth Worker - run as many instances as needed (`docker-compose up -d --scale truth-worker=2`)
+* HAProxy - reachable at `localhost:3333` -or- `${tenantId}.127.0.0.1.xip.io:3333`
 * Mongo Express - reachable at `localhost:3334`
-
+* RabbitMQ Management - reachable at `localhost:15672`
 
 ## Planned:
 
