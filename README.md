@@ -117,11 +117,6 @@ run `npm install` to load local dependencies
 `npm test` to run Mocha/Supertest API tests
 `npm start` or `./bin/www` to run server API locally
 
-make sure to add the following line to your local `/etc/hosts` file:
-`127.0.0.1       non-existent-tenant.domain.local joe.domain.local fred.domain.local test-tenant.domain.local barney.domain.local` for tests to pass
-
-I will update the tests to use nip.io in the future perhaps ...
-
 See `sample.env` for available ENV overrides.
 
 Running `docker-compose build truth` will build a local Docker-image.
@@ -147,31 +142,31 @@ By the time the middleware is completed, the Tenant scope is defined (isolation 
 ### Example API calls:
 
 #### Tenants API:
-`http://global.domain.local/objects/v1/tenants/v1` === all "tenants" objects from "global" namespace
+`http://global.127.0.0.1.nip.io/tenants/v1` === all "tenants" objects from "global" namespace
 
 #### Entities API:
-`http://joe.domain.local/entities/v1/products` === one "products" entity from "joe" namespace
+`http://joe.127.0.0.1.nip.io/entities/v1/products` === one "products" entity from "joe" namespace
 
 #### Instances API:
-`http://joe.domain.local/objects/v1/products` === all "products" objects from "joe" namespace
+`http://joe.127.0.0.1.nip.io/objects/v1/products` === all "products" objects from "joe" namespace
 
-`http://joe.domain.local/objects/v1/products/product-123` === one "products" object from "joe" namespace
+`http://joe.127.0.0.1.nip.io/objects/v1/products/product-123` === one "products" object from "joe" namespace
 
 #### Contexts API
-`http://joe.domain.local/contexts/v1` === all contexts from "joe" namespace
+`http://joe.127.0.0.1.nip.io/contexts/v1` === all contexts from "joe" namespace
 
-`http://joe.domain.local/contexts/v1/product-details` === defines dynamic bindings for "product-details" context from "joe" namespace
+`http://joe.127.0.0.1.nip.io/contexts/v1/product-details` === defines dynamic bindings for "product-details" context from "joe" namespace
 
-`http://joe.domain.local/contexts/product-details/render?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === one dynamic object graph (mixed entities) of all information needed to render "product-details" context from "joe" namespace
+`http://joe.127.0.0.1.nip.io/contexts/product-details/render?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === one dynamic object graph (mixed entities) of all information needed to render "product-details" context from "joe" namespace
 
 #### Templates API
-`http://joe.domain.local/templates/v1` === all templates from "joe" namespace
+`http://joe.127.0.0.1.nip.io/templates/v1` === all templates from "joe" namespace
 
-`http://joe.domain.local/templates/v1/catalog-xml` === defines dynamic template "catalog-xml" from "joe" namespace (Handlebars template + content-type)
+`http://joe.127.0.0.1.nip.io/templates/v1/catalog-xml` === defines dynamic template "catalog-xml" from "joe" namespace (Handlebars template + content-type)
 
-`http://joe.domain.local/templates/v1/catalog-xml/render/products/product-123` === dynamic rendering 'catalog-xml' template with "products/product-123" instance context from "joe" namespace
+`http://joe.127.0.0.1.nip.io/templates/v1/catalog-xml/render/products/product-123` === dynamic rendering 'catalog-xml' template with "products/product-123" instance context from "joe" namespace
 
-`http://joe.domain.local/templates/v1/catalog-xml/render/contexts/product-details?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === dynamic rendering 'catalog-xml' template with dynamic context "product-details" object graph as context from "joe" namespace (and returned with content-type='text/xml')
+`http://joe.127.0.0.1.nip.io/templates/v1/catalog-xml/render/contexts/product-details?pid=product-123&category=mens-suits&recommended=product1,product2,product3` === dynamic rendering 'catalog-xml' template with dynamic context "product-details" object graph as context from "joe" namespace (and returned with content-type='text/xml')
 
 ### Design Decisions
 
