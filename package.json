@@ -9,6 +9,7 @@
     "coverage": "TENANT_TOKEN=123 node_modules/.bin/nyc --reporter=html --reporter=text node_modules/.bin/mocha -R spec test test/**"
   },
   "dependencies": {
+    "amqplib": "^0.5.3",
     "bluebird": "^3.5.3",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",

@@ -38,6 +38,14 @@ Using DNS subdomains, http://_subdomain_._domain_, this service provides a REST 
 
 * Dynamic Applications
 
+- "path w/ params and query": {
+  layout: 'contains page structure',
+  template: 'page detail',
+}
+
+- design front end component to client-side render in VueJS
+
+
 ## Getting Started
 
 ### Dependencies
