@@ -25,6 +25,7 @@ services:
       - ES_URL=es:9200
       - REDIS_URL=redis://redis:6379/1
       - TENANT_TOKEN=123
+      - USE_MQ=true
     volumes:
       - "./:/usr/src/app"
     expose:

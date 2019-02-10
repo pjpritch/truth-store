@@ -43,14 +43,6 @@ app.enable('trust proxy');
 
 app.use(helmet());
 
-const apiLimiter = rateLimit({
-  store: new RedisStore({
-    client: cache.getClient(),
-  }),
-  windowMs: API_RATE_LIMIT_WINDOW_MS,
-  max: API_RATE_LIMIT_MAX,
-});
-
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -68,6 +60,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/status', (req, res) => {
   // Add logic here
   res.json({ status: 'up' });
+});
+
+const apiLimiter = rateLimit({
+  store: new RedisStore({
+    client: cache.getClient(),
+  }),
+  windowMs: API_RATE_LIMIT_WINDOW_MS,
+  max: API_RATE_LIMIT_MAX,
 });
 
 app.use('/tenants/v1', apiLimiter, tenants);
