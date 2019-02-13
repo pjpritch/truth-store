@@ -14,15 +14,20 @@ const cache = require('./lib/cache');
 
 // const sassMiddleware = require('node-sass-middleware');
 const helpers = require('./lib/handlebars-helpers');
-const { validateAccessToken } = require('./lib/middleware');
+const { validateAccessToken, attachAppContext } = require('./lib/middleware');
 const { NotFoundError } = require('./lib/errors');
 const { API_RATE_LIMIT_MAX, API_RATE_LIMIT_WINDOW_MS } = require('./lib/constants');
+
+const index = require('./routes/index');
+
+const dashboard = require('./routes/dashboard');
 
 const tenants = require('./routes/tenants');
 const entities = require('./routes/entities');
 const contexts = require('./routes/contexts');
 const templates = require('./routes/templates');
 const instances = require('./routes/instances');
+const apps = require('./routes/apps');
 
 const app = express();
 const exphbs = require('express-handlebars');
@@ -62,6 +67,8 @@ app.use('/status', (req, res) => {
   res.json({ status: 'up' });
 });
 
+app.use('/ace-builds', express.static(path.join(__dirname, 'node_modules/ace-builds')));
+
 const apiLimiter = rateLimit({
   store: new RedisStore({
     client: cache.getClient(),
@@ -76,6 +83,10 @@ app.use('/entities/v1', apiLimiter, validateAccessToken, entities);
 app.use('/templates/v1', apiLimiter, validateAccessToken, templates);
 app.use('/contexts/v1', apiLimiter, validateAccessToken, contexts);
 app.use('/objects/v1', apiLimiter, validateAccessToken, instances);
+app.use('/apps/v1', apiLimiter, validateAccessToken, apps);
+
+app.use('/dashboard', attachAppContext, dashboard);
+app.use('/', index);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

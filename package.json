@@ -10,6 +10,7 @@
     "coverage": "TENANT_TOKEN=123 node_modules/.bin/nyc --reporter=html --reporter=text node_modules/.bin/mocha -R spec test test/**"
   },
   "dependencies": {
+    "ace-builds": "^1.4.2",
     "amqplib": "^0.5.3",
     "bluebird": "^3.5.3",
     "body-parser": "~1.18.2",
@@ -26,10 +27,13 @@
     "morgan": "~1.9.0",
     "nano": "^8.0.0",
     "node-sass-middleware": "0.9.8",
+    "path-to-regexp": "^3.0.0",
     "rate-limit-redis": "^1.6.0",
     "redis": "^2.8.0",
     "serve-favicon": "~2.4.5",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "vue": "^2.6.4",
+    "vue-server-renderer": "^2.6.4"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

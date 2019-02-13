@@ -1,5 +1,7 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+global.Promise = require('bluebird');
+
 const queue = require('./lib/queue');
 
 const {
@@ -39,7 +41,7 @@ async function handleChangeEvent(msg) {
   }
 }
 
-(async () => {
+setTimeout(async () => {
   await queue.init(1);
 
   await queue.subscribeChangeEvents(async (msg) => {
@@ -59,4 +61,4 @@ async function handleChangeEvent(msg) {
 
   // eslint-disable-next-line no-console
   console.log('Listening for mutation events.');
-})();
+}, 1000);
