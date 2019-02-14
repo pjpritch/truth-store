@@ -1,5 +1,6 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+const { isArray } = require('util');
 const express = require('express');
 const { Instance, Entity } = require('../lib/db');
 const { NotFoundError } = require('../lib/errors');
@@ -78,8 +79,15 @@ router.get('/:entityId/:instanceId', async (req, res) => {
   const { instanceId, entityId } = req.params;
 
   try {
-    const result = await Instance.findOne(db, entityId, instanceId);
+    let result = await Instance.findOne(db, entityId, instanceId);
     if (!result) throw new NotFoundError();
+
+    if (isArray(result)) {
+      result = {
+        data: result,
+        total: result.length,
+      };
+    }
 
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
