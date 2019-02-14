@@ -1,5 +1,6 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+const debug = require('debug')('queue-worker');
 const queue = require('./lib/queue');
 
 const {
@@ -18,8 +19,8 @@ async function handleChangeEvent(msg) {
     info,
   } = msg;
 
-  // eslint-disable-next-line no-console,object-curly-newline
-  console.log(`Handling Change Event: ${{ _tenantId, _entityId, type, info }}`);
+  // eslint-disable-next-line object-curly-newline
+  debug(`Handling Change Event: ${{ _tenantId, _entityId, type, info }}`);
 
   switch (type) {
     case CHANGE_EVENT_TYPE:
@@ -32,10 +33,9 @@ async function handleChangeEvent(msg) {
       await Instance.doAfterGet(_tenantId, _entityId, info.instance);
       break;
     default:
-      // eslint-disable-next-line no-console
-      console.log(`Unknown Event Type: '${type}'`);
-      // eslint-disable-next-line no-console
-      console.log(msg);
+
+      debug(`Unknown Event Type: '${type}'`);
+      debug(msg);
   }
 }
 
@@ -49,14 +49,13 @@ async function handleChangeEvent(msg) {
       const event = JSON.parse(content);
 
       await handleChangeEvent(event);
-      // eslint-disable-next-line no-console
-      console.log(event);
+
+      debug(event);
       queue.ack(msg);
     } catch (e) {
       queue.reject(msg);
     }
   });
 
-  // eslint-disable-next-line no-console
-  console.log('Listening for mutation events.');
+  debug('Listening for mutation events.');
 })();
