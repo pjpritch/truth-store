@@ -43,12 +43,13 @@ services:
     user: "node"
     working_dir: /usr/src/app
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - MONGO_URL=mongodb://mongo:27017/test
       - AMQP_URL=amqp://user:user@rabbitmq
       - ES_URL=es:9200
       - REDIS_URL=redis://redis:6379/1
       - TENANT_TOKEN=123
+      - DEBUG=queue-worker
     volumes:
       - "./:/usr/src/app"
     healthcheck:

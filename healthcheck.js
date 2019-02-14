@@ -10,8 +10,7 @@ const options = {
 };
 
 const request = http.request(options, (res) => {
-  // eslint-disable-next-line no-console
-  console.log(`STATUS: ${res.statusCode}`);
+  debug(`STATUS: ${res.statusCode}`);
   if (res.statusCode === 200) {
     process.exit(0);
   } else {
@@ -21,7 +20,7 @@ const request = http.request(options, (res) => {
 
 request.on('error', (err) => {
   // eslint-disable-next-line no-console
-  console.log(`ERROR: ${err.message}\n${err.stack}`);
+  console.error(`ERROR: ${err.message}\n${err.stack}`);
   process.exit(1);
 });
 
