@@ -36,21 +36,27 @@ Using DNS subdomains, http://_subdomain_._domain_, this service provides a REST 
 
 * Transform API - render API instances/contexts into other schemas, using DB-defined mapping models (key path and inline functions).
 
+* Outgoing REST - web hooks
+
+* Real-time Notifications - web sockets or MQTT
+
+* Real User/Auth sub-system (JWT tokens?)(OAuth2?)
+
 * Frontend dashboard for APIs:
-- Contexts
-- Entities
-- Templates
+  - Contexts
+  - Entities
+  - Templates
 
 * Dynamic Applications
-- Middleware and SDK for ExpressJS app running on same cluster (using k8s internal load balancer and private HTTP header for tenant)
+  - Middleware and SDK for ExpressJS app running on same cluster (using k8s internal load balancer and private HTTP header for tenant)
 
-- Mapping routes to context + templates
-- "path w/ params and query": {
-  layout: 'contains page structure',
-  template: 'page detail',
-}
+  - Mapping routes to context + templates
+  - "path w/ params and query": {
+    layout: 'contains page structure',
+    template: 'page detail',
+  }
 
-- design front end component to client-side render in VueJS
+  - design front end component to client-side render in VueJS
 
 
 ## Getting Started
