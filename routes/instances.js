@@ -109,6 +109,48 @@ router.post('/:entityId/:instanceId', async (req, res) => {
   }
 });
 
+// create a new instance(s)
+router.post('/:entityId', async (req, res) => {
+  const { db, body } = req;
+  const { entityId } = req.params;
+  const isArrayBody = isArray(body);
+
+  const instances = isArrayBody ? body : [body];
+
+  try {
+    const result = await Promise.all(instances
+      .map(instance => Instance.create(db, entityId, instance.id, instance)));
+
+    const response = isArrayBody ? { data: result, total: result.length } : result[0];
+
+    Instance.handleAPIResponse(res, entityId, response, 201);
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, entityId, e);
+  }
+});
+
+// create a new instance(s)
+router.post('/', async (req, res) => {
+  const { db, body } = req;
+
+  const entityIds = Object.keys(body);
+
+  try {
+    const result = await Promise.all(entityIds.map((entityId) => {
+      const instances = body[entityId];
+      return Promise.all(instances
+        .map(instance => Instance.create(db, entityId, instance.id, instance)));
+    }));
+    const resultMap = {};
+    entityIds.forEach((entityId, i) => {
+      resultMap[entityId] = result[i];
+    });
+    Instance.handleAPIResponse(res, entityIds.join(','), { data: resultMap }, 201);
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, entityIds.join(','), e);
+  }
+});
+
 // replace an existing instance
 router.put('/:entityId/:instanceId', async (req, res) => {
   const { db, body } = req;

@@ -6,16 +6,13 @@ const app = require('../../app');
 const {
   globalDB,
   tenantDB,
-  Instance,
-  Entity,
-  Context,
-  Template,
   Tenant,
+  Transform,
 } = require('../../lib/db');
 
 const {
-  TEMPLATE_API_VERSION,
-  TEMPLATE_COLLECTION_NAME,
+  TRANSFORM_API_VERSION,
+  TRANSFORM_COLLECTION_NAME,
   X_STORE_TOKEN,
 } = require('../../lib/constants');
 
@@ -44,9 +41,9 @@ describe('/transforms/v1 API', function test() {
     await Tenant.delete(db, TENANT_ID);
   });
 
-  context('GET /templates/v1', () => {
+  context('GET /transforms/v1', () => {
     it('should fail with a 401 w/o the auth token', async () => {
-      const { body } = await request.get('/templates/v1')
+      const { body } = await request.get('/transforms/v1')
         .expect('Content-type', /json/)
         .expect(401);
 
@@ -54,7 +51,7 @@ describe('/transforms/v1 API', function test() {
     });
 
     it('should fail with a 403 w/ bad auth token', async () => {
-      const { body } = await request.get('/templates/v1?token=velma')
+      const { body } = await request.get('/transforms/v1?token=velma')
         .expect('Content-type', /json/)
         .expect(403);
 
@@ -62,34 +59,34 @@ describe('/transforms/v1 API', function test() {
     });
 
     it('should work using query token', async () => {
-      const { body } = await request.get(`/templates/v1?token=${token}`)
+      const { body } = await request.get(`/transforms/v1?token=${token}`)
         .expect('Content-type', /json/)
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
       assert.ok(body.data);
     });
 
     it('should work with header token', async () => {
-      const { body } = await request.get('/templates/v1')
+      const { body } = await request.get('/transforms/v1')
         .expect('Content-Type', /json/)
         .set(X_STORE_TOKEN, token)
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
       assert.ok(body.data);
     });
   });
 
-  context('POST /templates/v1/:templateId', () => {
+  context('POST /transforms/v1/:transformId', () => {
     it('should fail with a 401 w/o the auth token', async () => {
-      const { body } = await request.post('/templates/v1/product-xml')
+      const { body } = await request.post('/transforms/v1/schema2')
         .send({ other: 'stuff' })
         .set('Accept', 'application/json')
         .expect('Content-type', /json/)
@@ -98,8 +95,8 @@ describe('/transforms/v1 API', function test() {
       assert.ok(body.error, 'Unauthorized');
     });
 
-    it('should create a new entity', async () => {
-      const { body } = await request.post('/templates/v1/product-xml')
+    it('should create a new Transform', async () => {
+      const { body } = await request.post('/transforms/v1/schema2')
         .send({ other: 'stuff' })
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
@@ -107,31 +104,31 @@ describe('/transforms/v1 API', function test() {
         .expect(201);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
-      assert.equal(body.id, 'product-xml');
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
+      assert.equal(body.id, 'schema2');
       assert.equal(body.other, 'stuff');
     });
   });
 
-  context('GET /templates/v1/:templateId', () => {
-    it('should get existing Template', async () => {
-      const { body } = await request.get('/templates/v1/product-xml')
+  context('GET /transforms/v1/:transformId', () => {
+    it('should get existing Transform', async () => {
+      const { body } = await request.get('/transforms/v1/schema2')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
-      assert.equal(body.id, 'product-xml');
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
+      assert.equal(body.id, 'schema2');
     });
 
     it('should NOT get non-existing entity', async () => {
-      const { body } = await request.get('/templates/v1/joseph')
+      const { body } = await request.get('/transforms/v1/joseph')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
@@ -141,9 +138,9 @@ describe('/transforms/v1 API', function test() {
     });
   });
 
-  context('PATCH /templates/v1/:templateId', () => {
-    it('should UPDATE an existing Template', async () => {
-      const { body } = await request.patch('/templates/v1/product-xml')
+  context('PATCH /transforms/v1/:transformId', () => {
+    it('should UPDATE an existing Transform', async () => {
+      const { body } = await request.patch('/transforms/v1/schema2')
         .send({ other2: 'stuff2' })
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
@@ -151,16 +148,16 @@ describe('/transforms/v1 API', function test() {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
-      assert.equal(body.id, 'product-xml');
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
+      assert.equal(body.id, 'schema2');
       assert.equal(body.other, 'stuff');
       assert.equal(body.other2, 'stuff2');
     });
 
-    it('should NOT UPDATE a non-existing Template', async () => {
-      const { body } = await request.patch('/templates/v1/gerald')
+    it('should NOT UPDATE a non-existing Transform', async () => {
+      const { body } = await request.patch('/transforms/v1/gerald')
         .send({ other2: 'stuff2' })
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
@@ -171,9 +168,9 @@ describe('/transforms/v1 API', function test() {
     });
   });
 
-  context('PUT /templates/v1/:templateId', () => {
-    it('should REPLACE an existing Template', async () => {
-      const { body } = await request.put('/templates/v1/product-xml')
+  context('PUT /transforms/v1/:transformId', () => {
+    it('should REPLACE an existing Transform', async () => {
+      const { body } = await request.put('/transforms/v1/schema2')
         .send({ other: 'stuff' })
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
@@ -181,31 +178,31 @@ describe('/transforms/v1 API', function test() {
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
-      assert.equal(body.id, 'product-xml');
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
+      assert.equal(body.id, 'schema2');
       assert.equal(body.other, 'stuff');
     });
   });
 
-  context('DELETE /templates/v1/:templateId', () => {
-    it('should DELETE an existing Template', async () => {
-      const { body } = await request.delete('/templates/v1/product-xml')
+  context('DELETE /transforms/v1/:transformId', () => {
+    it('should DELETE an existing Transform', async () => {
+      const { body } = await request.delete('/transforms/v1/schema2')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
         .expect(200);
 
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._v, TEMPLATE_API_VERSION);
+      assert.equal(body._v, TRANSFORM_API_VERSION);
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._entity, TEMPLATE_COLLECTION_NAME);
-      assert.equal(body.id, 'product-xml');
+      assert.equal(body._entity, TRANSFORM_COLLECTION_NAME);
+      assert.equal(body.id, 'schema2');
     });
 
-    it('should NOT DELETE a non-existing Template', async () => {
-      const { body } = await request.delete('/templates/v1/product-xml')
+    it('should NOT DELETE a non-existing Transform', async () => {
+      const { body } = await request.delete('/transforms/v1/schema2')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
@@ -216,57 +213,102 @@ describe('/transforms/v1 API', function test() {
     });
   });
 
-  context('GET /templates/v1/product-detail-xml/render?pid=product-123', () => {
-    let product,
-      product2;
-
+  context('GET /transforms/v1/:transformId/render/:entityId/:instanceId', () => {
     before(async () => {
-      await Entity.create(db, 'products', {});
-      product = await Instance.create(db, 'products', 'product-124', { name: 'Product 124' });
-      product2 = await Instance.create(db, 'products', 'product-125', { name: 'Product 125' });
-      await Context.create(db, 'product-detail', {
-        bindings: {
-          product: {
-            entity: 'products',
-            param: 'pid',
-          },
-          upsellProduct: {
-            entity: 'products',
-            param: 'upid',
-          },
+      // create product
+      // create transform
+    });
+
+    it('should render a transformed document with simple keys', async () => {
+      const product = {
+        id: 'product-123',
+        name: 'Product 123',
+        category_id: 'main-category',
+      };
+
+      const simpleKeyTransform = {
+        productId: 'id',
+        displayName: 'name',
+        categoryId: 'category_id',
+      };
+
+      const result = Transform.render(simpleKeyTransform, product);
+
+      assert.deepEqual(result, {
+        productId: 'product-123',
+        displayName: 'Product 123',
+        categoryId: 'main-category',
+      });
+    });
+
+    it('should render a transformed document with key paths', async () => {
+      const product = {
+        something: { id: 'product-123' },
+        else: { name: 'Product 123' },
+        entirely: { period: { category_id: 'main-category' } },
+      };
+
+      const simpleKeyPathTransform = {
+        productId: 'something.id',
+        displayName: 'else.name',
+        categoryId: 'entirely.period.category_id',
+      };
+
+      const result = Transform.render(simpleKeyPathTransform, product);
+
+      assert.deepEqual(result, {
+        productId: 'product-123',
+        displayName: 'Product 123',
+        categoryId: 'main-category',
+      });
+    });
+
+    it('should render a transformed document with inline functions', async () => {
+      const product = {
+        something: { id: 'product-123' },
+        else: { name: 'Product 123' },
+        entirely: { period: { category_id: 'main-category' } },
+      };
+
+      const simpleKeyTransform = {
+        productId: (key, doc) => doc.something.id,
+        displayName: (key, doc) => ({ [key]: doc.else.name }),
+        categoryId: (key, doc) => doc.entirely.period.category_id,
+      };
+
+      const result = Transform.render(simpleKeyTransform, product);
+
+      assert.deepEqual(result, {
+        productId: 'product-123',
+        displayName: {
+          displayName: 'Product 123',
         },
-      });
-      await Template.create(db, 'product-xml', {
-        content: '<product id="{{id}}" name="{{name}}"></product>',
-        contentType: 'text/xml',
-      });
-      await Template.create(db, 'product-detail-xml', {
-        content: '<product id="{{product.id}}" name="{{product.name}}"></product>',
-        contentType: 'text/xml',
+        categoryId: 'main-category',
       });
     });
 
-    it('should return a rendered dynamic template from an instance', async () => {
-      const { text } = await request.get(`/templates/v1/product-xml/render/products/${product2.id}`)
-        .set('Accept', 'text/xml')
-        .set(X_STORE_TOKEN, token)
-        .expect('Content-type', /xml/)
-        .expect(200);
+    it('should render a transformed document with spread operator', async () => {
+      const product = {
+        id: 'product-123',
+        name: 'Product 123',
+        category_id: 'main-category',
+      };
 
-      // eslint-disable-next-line no-underscore-dangle
-      assert.equal(text, `<product id="${product2.id}" name="${product2.name}"></product>`);
-    });
+      const simpleSpreadTransform = {
+        '...': (key, doc) => ({
+          productId: doc.id,
+          displayName: doc.name,
+          categoryId: doc.category_id
+        }),
+      };
 
-    it('should return a rendered dynamic template from a context', async () => {
-      // eslint-disable-next-line max-len
-      const { text } = await request.get(`/templates/v1/product-detail-xml/render/contexts/product-detail?pid=${product.id}&upid=${product2.id}`)
-        .set('Accept', 'text/xml')
-        .set(X_STORE_TOKEN, token)
-        .expect('Content-type', /xml/)
-        .expect(200);
+      const result = Transform.render(simpleSpreadTransform, product);
 
-      // eslint-disable-next-line no-underscore-dangle
-      assert.equal(text, `<product id="${product.id}" name="${product.name}"></product>`);
+      assert.deepEqual(result, {
+        productId: 'product-123',
+        displayName: 'Product 123',
+        categoryId: 'main-category',
+      });
     });
   });
 });

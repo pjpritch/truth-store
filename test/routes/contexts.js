@@ -280,6 +280,7 @@ describe('/contexts/v1 API', function test() {
     });
 
     it('should return a dynamic context', async () => {
+      // eslint-disable-next-line max-len
       const { body } = await request.get('/contexts/v1/product-detail/render?pid=product-124&upid=product-125,product-126')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)

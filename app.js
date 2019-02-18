@@ -22,6 +22,8 @@ const tenants = require('./routes/tenants');
 const entities = require('./routes/entities');
 const contexts = require('./routes/contexts');
 const templates = require('./routes/templates');
+const transforms = require('./routes/transforms');
+const webhooks = require('./routes/webhooks');
 const instances = require('./routes/instances');
 
 const app = express();
@@ -75,6 +77,8 @@ app.use('/tenants/v1', apiLimiter, tenants);
 app.use('/entities/v1', apiLimiter, validateAccessToken, entities);
 app.use('/templates/v1', apiLimiter, validateAccessToken, templates);
 app.use('/contexts/v1', apiLimiter, validateAccessToken, contexts);
+app.use('/transforms/v1', apiLimiter, validateAccessToken, transforms);
+app.use('/webhooks/v1', apiLimiter, validateAccessToken, webhooks);
 app.use('/objects/v1', apiLimiter, validateAccessToken, instances);
 
 // catch 404 and forward to error handler

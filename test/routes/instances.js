@@ -120,6 +120,36 @@ describe('/objects/v1 API', function test() {
     });
   });
 
+  context('POST /objects/v1/:entity', () => {
+    it('should create a bunch of objects of the same type', async () => {
+      const payload = [{
+        id: 'product-1000',
+        name: 'Product 1000'
+      }, {
+        id: 'product-1001',
+        name: 'Product 1001'
+      }, {
+        id: 'product-1002',
+        name: 'Product 1002'
+      }];
+      const { body } = await request.post('/objects/v1/products')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .send(payload)
+        .expect('Content-type', /json/)
+        .expect(201);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(INSTANCE_API_VERSION, body._v);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal('products', body._entity);
+
+      const { data } = body;
+
+      assert.equal(data.length, payload.length);
+    });
+  });
+
   context('GET /objects/v1/:entityId/:instanceId', () => {
     it('should get existing Instance', async () => {
       const { body } = await request.get('/objects/v1/products/product-123')
@@ -174,7 +204,7 @@ describe('/objects/v1 API', function test() {
   context('GET /objects/v1/:entityId/search', () => {
     it('should search and find an existing Instance', async () => {
       await delay(1);
-      const { body } = await request.get('/objects/v1/products/search?q=product-123')
+      const { body } = await request.get('/objects/v1/products/search?q=id:"product-123"')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
@@ -185,7 +215,7 @@ describe('/objects/v1 API', function test() {
       // eslint-disable-next-line no-underscore-dangle
       assert.equal(body._entity, 'products');
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._query, 'product-123');
+      assert.equal(body._query, 'id:"product-123"');
       assert.ok(body.data);
       assert.equal(body.data.length, 1);
       assert.equal(body.data[0].id, 'product-123');
@@ -196,7 +226,7 @@ describe('/objects/v1 API', function test() {
     it('should search and find an existing Instance', async () => {
       // we have to give ES a chance to re-index the document
       await delay(1);
-      const { body } = await request.get('/objects/v1/search?q=product-123')
+      const { body } = await request.get('/objects/v1/search?q=id:"product-123"')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
         .expect('Content-type', /json/)
@@ -207,7 +237,7 @@ describe('/objects/v1 API', function test() {
       // eslint-disable-next-line no-underscore-dangle
       assert.equal(body._entity, 'search');
       // eslint-disable-next-line no-underscore-dangle
-      assert.equal(body._query, 'product-123');
+      assert.equal(body._query, 'id:"product-123"');
       assert.ok(body.data);
       assert.equal(body.data.length, 1);
       // eslint-disable-next-line no-underscore-dangle
