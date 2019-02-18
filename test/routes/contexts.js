@@ -279,6 +279,25 @@ describe('/contexts/v1 API', function test() {
       assert.equal(body.upsellProduct.name, product2.name);
     });
 
+    it('should return a dynamic context', async () => {
+      // eslint-disable-next-line max-len
+      const { body } = await request.get('/contexts/v1/product-detail/render?pid=product-124&upid=product-125,product-126')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .expect('Content-type', /json/)
+        .expect(200);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._v, CONTEXT_API_VERSION);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._entity, CONTEXT_COLLECTION_NAME);
+      assert.equal(body.product.name, product.name);
+      assert.ok(body.upsellProduct);
+      assert.equal(body.upsellProduct.length, 2);
+      assert.equal(body.upsellProduct[0].name, product2.name);
+      assert.equal(body.upsellProduct[1].name, product3.name);
+    });
+
     it('should return a dynamic context with default derived values', async () => {
       const { body } = await request.get('/contexts/v1/product-detail/render?pid=product-124')
         .set('Accept', 'application/json')

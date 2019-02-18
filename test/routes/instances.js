@@ -8,6 +8,7 @@ const {
   tenantDB,
   Entity,
   Tenant,
+  Instance,
 } = require('../../lib/db');
 
 const {
@@ -20,6 +21,12 @@ const TENANT_ID = 'test-tenant';
 const TEST_DOMAIN = '.127.0.0.1.nip.io';
 const baseUrl = `http://${TENANT_ID}${TEST_DOMAIN}:${PORT}`;
 const request = require('supertest').agent(baseUrl);
+
+async function delay(s) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, s * 1000);
+  });
+}
 
 describe('/objects/v1 API', function test() {
   this.timeout(10000);
@@ -42,7 +49,7 @@ describe('/objects/v1 API', function test() {
     await Tenant.delete(db, TENANT_ID);
   });
 
-  context('GET /objects/v1/products', () => {
+  context('GET /objects/v1/:entityId', () => {
     it('should fail with a 401 w/o the auth token', async () => {
       const { body } = await request.get('/objects/v1/products')
         .expect('Content-type', /json/)
@@ -113,6 +120,36 @@ describe('/objects/v1 API', function test() {
     });
   });
 
+  context('POST /objects/v1/:entity', () => {
+    it('should create a bunch of objects of the same type', async () => {
+      const payload = [{
+        id: 'product-1000',
+        name: 'Product 1000'
+      }, {
+        id: 'product-1001',
+        name: 'Product 1001'
+      }, {
+        id: 'product-1002',
+        name: 'Product 1002'
+      }];
+      const { body } = await request.post('/objects/v1/products')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .send(payload)
+        .expect('Content-type', /json/)
+        .expect(201);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(INSTANCE_API_VERSION, body._v);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal('products', body._entity);
+
+      const { data } = body;
+
+      assert.equal(data.length, payload.length);
+    });
+  });
+
   context('GET /objects/v1/:entityId/:instanceId', () => {
     it('should get existing Instance', async () => {
       const { body } = await request.get('/objects/v1/products/product-123')
@@ -128,7 +165,32 @@ describe('/objects/v1 API', function test() {
       assert.equal(body.id, 'product-123');
     });
 
-    it('should NOT get non-existing entity', async () => {
+    it('should get 2 existing Instances at once', async () => {
+      const product124 = await Instance.create(db, 'products', 'product-124', {
+        some: 'data',
+        better: 'than',
+        none: 'at all',
+      });
+      const { body } = await request.get('/objects/v1/products/product-123,product-124')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .expect('Content-type', /json/)
+        .expect(200);
+
+      await Instance.delete(db, 'products', product124.id);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._v, INSTANCE_API_VERSION);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._entity, 'products');
+      assert.equal(body.total, 2);
+      assert.ok(body.data, 2);
+      assert.equal(body.data.length, 2);
+      assert.equal(body.data[0].id, 'product-123');
+      assert.equal(body.data[1].id, 'product-124');
+    });
+
+    it('should NOT get non-existing Instance', async () => {
       const { body } = await request.get('/objects/v1/products/joseph')
         .set('Accept', 'application/json')
         .set(X_STORE_TOKEN, token)
@@ -136,6 +198,51 @@ describe('/objects/v1 API', function test() {
         .expect(404);
 
       assert.ok(body.error);
+    });
+  });
+
+  context('GET /objects/v1/:entityId/search', () => {
+    it('should search and find an existing Instance', async () => {
+      await delay(1);
+      const { body } = await request.get('/objects/v1/products/search?q=id:"product-123"')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .expect('Content-type', /json/)
+        .expect(200);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._v, INSTANCE_API_VERSION);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._entity, 'products');
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._query, 'id:"product-123"');
+      assert.ok(body.data);
+      assert.equal(body.data.length, 1);
+      assert.equal(body.data[0].id, 'product-123');
+    });
+  });
+
+  context('GET /objects/v1/search', () => {
+    it('should search and find an existing Instance', async () => {
+      // we have to give ES a chance to re-index the document
+      await delay(1);
+      const { body } = await request.get('/objects/v1/search?q=id:"product-123"')
+        .set('Accept', 'application/json')
+        .set(X_STORE_TOKEN, token)
+        .expect('Content-type', /json/)
+        .expect(200);
+
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._v, INSTANCE_API_VERSION);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._entity, 'search');
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body._query, 'id:"product-123"');
+      assert.ok(body.data);
+      assert.equal(body.data.length, 1);
+      // eslint-disable-next-line no-underscore-dangle
+      assert.equal(body.data[0]._entity, 'products');
+      assert.equal(body.data[0].id, 'product-123');
     });
   });
 

@@ -1,5 +1,6 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+const debug = require('debug')('healthcheck');
 const http = require('http');
 
 const options = {

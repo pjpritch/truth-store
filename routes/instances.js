@@ -1,5 +1,6 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+const { isArray } = require('util');
 const express = require('express');
 const { Instance, Entity } = require('../lib/db');
 const { NotFoundError } = require('../lib/errors');
@@ -78,8 +79,15 @@ router.get('/:entityId/:instanceId', async (req, res) => {
   const { instanceId, entityId } = req.params;
 
   try {
-    const result = await Instance.findOne(db, entityId, instanceId);
+    let result = await Instance.findOne(db, entityId, instanceId);
     if (!result) throw new NotFoundError();
+
+    if (isArray(result)) {
+      result = {
+        data: result,
+        total: result.length,
+      };
+    }
 
     Instance.handleAPIResponse(res, entityId, result);
   } catch (e) {
@@ -98,6 +106,48 @@ router.post('/:entityId/:instanceId', async (req, res) => {
     Instance.handleAPIResponse(res, entityId, result, 201);
   } catch (e) {
     Instance.handleAPIErrorResponse(res, entityId, e);
+  }
+});
+
+// create a new instance(s)
+router.post('/:entityId', async (req, res) => {
+  const { db, body } = req;
+  const { entityId } = req.params;
+  const isArrayBody = isArray(body);
+
+  const instances = isArrayBody ? body : [body];
+
+  try {
+    const result = await Promise.all(instances
+      .map(instance => Instance.create(db, entityId, instance.id, instance)));
+
+    const response = isArrayBody ? { data: result, total: result.length } : result[0];
+
+    Instance.handleAPIResponse(res, entityId, response, 201);
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, entityId, e);
+  }
+});
+
+// create a new instance(s)
+router.post('/', async (req, res) => {
+  const { db, body } = req;
+
+  const entityIds = Object.keys(body);
+
+  try {
+    const result = await Promise.all(entityIds.map((entityId) => {
+      const instances = body[entityId];
+      return Promise.all(instances
+        .map(instance => Instance.create(db, entityId, instance.id, instance)));
+    }));
+    const resultMap = {};
+    entityIds.forEach((entityId, i) => {
+      resultMap[entityId] = result[i];
+    });
+    Instance.handleAPIResponse(res, entityIds.join(','), { data: resultMap }, 201);
+  } catch (e) {
+    Instance.handleAPIErrorResponse(res, entityIds.join(','), e);
   }
 });
 

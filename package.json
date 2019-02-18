@@ -12,6 +12,7 @@
   "dependencies": {
     "ace-builds": "^1.4.2",
     "amqplib": "^0.5.3",
+    "axios": "^0.18.0",
     "bluebird": "^3.5.3",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
@@ -38,7 +39,7 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "nodemon": "^1.18.10",
-    "nyc": "^13.1.0",
+    "nyc": "^13.3.0",
     "supertest": "^3.4.2"
   }
 }
