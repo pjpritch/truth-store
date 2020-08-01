@@ -1,5 +1,7 @@
 // Copyright 2019 Peter Pritchard.  All rights reserved.
 
+global.Promise = require('bluebird');
+
 const debug = require('debug')('queue-worker');
 const queue = require('./lib/queue');
 

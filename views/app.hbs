@@ -1,0 +1,19 @@
+
+<div class="mdc-top-app-bar--fixed-adjust">
+<button onClick="document.querySelector('#content').value = editor.getValue(); document.querySelector('#submit').click();">save</button>
+</div>
+
+<form action="{{app.id}}/save" method="post">
+  <input id="content" name="content" type="hidden" value />
+  <input id="submit" type="submit" />
+</form>
+<div style="position:relative; height: 100vh">
+<div id="editor">{{ json app }}</div>
+</div>
+
+<script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/json");
+</script>

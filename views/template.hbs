@@ -1,0 +1,19 @@
+<div class="mdc-top-app-bar--fixed-adjust">
+<button onClick="document.querySelector('#content').value = editor.getValue(); document.querySelector('#submit').click();">save</button>
+</div>
+
+<form action="{{template.id}}/save" method="post">
+  <input id="content" name="content" type="hidden" value />
+  <input id="submit" type="submit" />
+</form>
+
+<div style="position: relative; height: 600px; top: 100px;">
+  <div id="editor">{{ template.content }}</div>
+</div>
+
+<script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/handlebars");
+</script>

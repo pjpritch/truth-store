@@ -1,4 +1,12 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<div id="app">
+  {{ message }}
+</div>
 
-<code>Tenants</code>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello world'
+    }
+  });
+</script>
